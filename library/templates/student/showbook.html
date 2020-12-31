@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+</head>
+<body>
+
+Book Detail
+
+{{ student.username }}
+
+<a class="btn btn-primary" href="/logout">Log Out</a>
+
+<a class="btn btn-primary" href="/student/booklist">Booklist</a>
+
+<a class="btn btn-primary" href="/student/history">History</a> <br> <br>
+
+Book id : {{ book.id }} <br>
+Book name : {{ book.name }} <br>
+Book desc : {{ book.desc }} <br>
+Book author : {{ book.author }} <br>
+Book pub date : {{ book.pub_date }} <br>
+
+<a href="" class="btn btn-primary">Borrow</a>
+
+
+<h3>SIMILIAR BOOK </h3>
+
+
+
+</body>
+</html>
