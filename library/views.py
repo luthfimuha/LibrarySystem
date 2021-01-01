@@ -297,54 +297,47 @@ def admin_logout(request):
 
 
 def admin_dashboard(request):
+    # Chart 1, Book By Category
+
+    chart1_label = []
+    chart1_data = []
+    book_types = Book.objects.values('type').distinct()
+    for type in book_types:
+        chart1_label.append(type['type'])
+
+    for label in chart1_label:
+        chart1_data.append(Book.objects.filter(type=label).count())
+
+    # Chart 2, Top 3 Most Loaned Book
+
+    top3_books = Book.objects.annotate(num_loan=Count('borrow')).order_by('-num_loan')[:3]
+
+    # Chart 3, Number of Loan by Day
+
+    chart3_label = []
+    chart3_data = []
+
+    loan_dates = Borrow.objects.values('borrowed_date').distinct()
+
+    for date in loan_dates:
+        chart3_label.append(str(date['borrowed_date']))
+
+    for label in chart3_label:
+        chart3_data.append(Borrow.objects.filter(borrowed_date=label).count())
+
+    print(loan_dates)
+    print(chart3_label)
+    print(chart3_data)
+
+    context = {
+        'chart1_label': chart1_label,
+        'chart1_data': chart1_data,
+        'top3_books': top3_books,
+        'chart3_label': chart3_label,
+        'chart3_data': chart3_data,
+    }
 
     if request.session.has_key('admin'):
-
-        #Chart 1, Book By Category
-
-        chart1_label = []
-        chart1_data = []
-        book_types = Book.objects.values('type').distinct()
-        for type in book_types:
-            chart1_label.append(type['type'])
-
-        for label in chart1_label:
-            chart1_data.append(Book.objects.filter(type=label).count())
-
-        #Chart 2, Top 3 Most Loaned Book
-
-        top3_books = Book.objects.annotate(num_loan=Count('borrow')).order_by('-num_loan')[:3]
-
-        #Chart 3, Number of Loan by Day
-
-        chart3_label = []
-        chart3_data = []
-
-        loan_dates = Borrow.objects.values('borrowed_date').distinct()
-
-        for date in loan_dates:
-            chart3_label.append(str(date['borrowed_date']))
-
-        for label in chart3_label:
-            chart3_data.append(Borrow.objects.filter(borrowed_date=label).count())
-
-        print(loan_dates)
-        print(chart3_label)
-        print(chart3_data)
-
-
-
-
-
-
-
-        context = {
-            'chart1_label' : chart1_label,
-            'chart1_data' : chart1_data,
-            'top3_books' : top3_books,
-            'chart3_label': chart3_label,
-            'chart3_data': chart3_data,
-        }
 
         return render(request, 'admin/dashboard.html', context=context)
 
@@ -357,7 +350,7 @@ def admin_dashboard(request):
 
             if username == 'admin' and password == 'admin':
                 request.session['admin'] = 'Ok'
-                return render(request, 'admin/dashboard.html')
+                return render(request, 'admin/dashboard.html',context=context)
 
             else:
                 return render(request, 'admin/admin_login.html',
