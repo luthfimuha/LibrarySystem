@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.min.css">
+    <script src="/static/js/jquery-3.5.1.slim.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<!-- Header -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-custom">
+    <a class="navbar-brand"> <img src="/static/images/logo.png" height="30px" class="mr-3">Library System</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+                <a class="nav-link">{{ student.username }}</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<!-- End of Header -->
+
+<div class="container mt-4 p-5 rounded shadow">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link" href="/student/dashboard">Dashboard</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link " href="/student/booklist">Booklist</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="/student/history">Loan History</a>
+        </li>
+    </ul>
+
+    <table class="table table-striped mt-4">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">Cover</th>
+            <th scope="col">Name</th>
+            <th scope="col">Author</th>
+            <th scope="col">Loan Date</th>
+            <th scope="col">Return Date</th>
+            <th scope="col">Status</th>
+            <th scope="col">Return Book</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for borrow in borrowlist %}
+            <tr>
+                <td ><img class="cover_thumb" src="/static/{{ borrow.book.cover }}"></td>
+                <td class="align-middle">{{ borrow.book.name|truncatechars:35 }}</td>
+                <td class="align-middle">{{ borrow.book.author|truncatechars:20 }}</td>
+                <td class="align-middle">{{ borrow.borrowed_date }}</td>
+                <td class="align-middle">{{ borrow.due_date }}</td>
+                <td class="align-middle">{{ borrow.status }}</td>
+
+                <td class="align-middle">
+                    {% if borrow.status == "Not returned" %}
+                        <form method="post" action="/student/return/">
+                            {% csrf_token %}
+                            <input type="hidden" name="borrow_id" value="{{ borrow.id }}">
+                            <button class="btn btn-danger" type="submit">Return</button>
+                        </form>
+                    {% endif %}
+
+
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+
+</body>
+</html>

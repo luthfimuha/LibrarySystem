@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.min.css">
+    <script src="/static/js/jquery-3.5.1.slim.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+
+<!-- Header -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-custom">
+    <a class="navbar-brand"> <img src="/static/images/logo.png" height="30px" class="mr-3">Library System</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+                <a class="nav-link">Admin</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<!-- End of Header -->
+
+<div class="container mt-4 p-5 rounded shadow" style="width: 50%">
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="/admin/booklist">Booklist</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/borrowlist">Loan List</a>
+        </li>
+    </ul>
+
+    <div class="row mt-3">
+
+        <div class="col">
+            <a href="/admin/booklist" class="btn btn-primary"><i class="fa fa-chevron-left mr-2" aria-hidden="true"></i>  Back</a>
+        </div>
+
+    </div>
+
+    <div class="row mt-2">
+
+        <div class="col" align="center">
+            <h5>Update Book</h5>
+        </div>
+
+    </div>
+
+    <div class="row mt-3">
+
+        <div class="col">
+            {% if msg != null %}
+                <div class="alert alert-danger" role="alert">
+                    {{ msg }}
+                </div>
+            {% endif %}
+
+            <form action="/saveupdate/" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label>Book name</label>
+                    <input class="form-control" type="hidden" name="id" value="{{ book.id }}">
+                    <input class="form-control" type="text" name="name" value="{{ book.name }}">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="form-control" type="text" name="desc" rows="6">
+                {{ book.desc }}
+            </textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Author</label>
+                        <input class="form-control" type="text" name="author" value="{{ book.author }}">
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label>Pub Date</label>
+                        <input class="form-control" type="date" name="pub_date" value="{{ book.pub_date }}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Type</label>
+                        <select class="form-control" name="type" required>
+                            <option value="{{ book.type }}" selected="selected">{{ book.type }}</option>
+                            <option value="Programming">Programming</option>
+                            <option value="Art">Art</option>
+                            <option value="Chemistry">Chemistry</option>
+                            <option value="Historical">Historical</option>
+                            <option value="Language">Language</option>
+                            <option value="Machine Learning">Machine Learning</option>
+                            <option value="Mathematic">Mathematic</option>
+                            <option value="Medical">Medical</option>
+                            <option value="Pshycology">Pshycology</option>
+                            <option value="Science">Science</option>
+                        </select>
+                    </div>
+
+
+                    <div class="form-group col-md-6">
+                        <label>Stock</label>
+                        <input class="form-control" type="number" name="stock" value="{{ book.stock }}">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label>Cover</label>
+                    <input class="form-control-file" type="file" name="cover">
+                </div>
+
+
+                <div class="text-center">
+                    <button type="submit" class=" btn btn-custom align-right">Update</button>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+
+
+
+
+
+
+</div>
+
+
+</body>
+
+</html>

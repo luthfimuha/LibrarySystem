@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.min.css">
+    <script src="/static/js/jquery-3.5.1.slim.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/Chart.js"></script>
+
+</head>
+<body>
+
+<!-- Header -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-custom">
+    <a class="navbar-brand"> <img src="/static/images/logo.png" height="30px" class="mr-3">Library System</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+                <a class="nav-link">Admin</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<!-- End of Header -->
+
+<div class="container mt-4 p-5 rounded shadow">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" href="/admin/dashboard">Dashboard</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/booklist">Booklist</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/borrowlist">Loan List</a>
+        </li>
+    </ul>
+
+
+    <div class="row mt-5">
+
+        <div class="col" align="center">
+             <h5 class="mb-3">Number of Books by Category</h5>
+            <canvas id="myChart" width="100" height="30"></canvas>
+        </div>
+
+    </div>
+
+    <div class="row mt-5">
+
+        <div class="col" align="center">
+            <h5 class="mb-5">Top 3 Most Loaned Books</h5>
+            <div class="row">
+                {% for book in top3_books %}
+                    <div class="col">
+                    
+                    <img class="cover_thumb" src="/static/{{ book.cover }}"> <br>
+
+                    {{ book.name }} <br>
+                        <b> Total Loan : {{ book.num_loan }} </b>
+
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col" align="center">
+            <h5>Number of Loan by Day</h5>
+            <canvas id="myChart2" width="100" height="30"></canvas>
+        </div>
+
+
+    </div>
+
+</div>
+
+{#<script>#}
+{#    var ctx = document.getElementById('myChart').getContext('2d');#}
+{#    var myChart = new Chart(ctx, {#}
+{#        type: 'pie',#}
+{#        data: {#}
+{#            labels: {{chart1_label|safe}},#}
+{#            datasets: [{#}
+{#                label: 'Number of Books by Category',#}
+{#                data: {{ chart1_data|safe }},#}
+{#                backgroundColor: [#}
+{#                    'rgb(255, 99, 132)',#}
+{#                    'rgb(54, 162, 235)',#}
+{#                    'rgb(255, 206, 86)',#}
+{#                    'rgb(75, 192, 192)',#}
+{#                    'rgb(153, 102, 255)',#}
+{#                    'rgb(255,159,64)'#}
+{#                ],#}
+{##}
+{#            }]#}
+{#        },#}
+{#        options: {#}
+{#            title: {#}
+{#                display: true,#}
+{#                text: 'Number of Books by Category'#}
+{#            }#}
+{#        }#}
+{#    });#}
+{#</script>#}
+
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{chart1_label|safe}},
+            datasets: [{
+                label: 'Books',
+                data: {{ chart1_data|safe }},
+                backgroundColor: [
+                    'rgba(255, 99, 132)',
+                    'rgba(54, 162, 235)',
+                    'rgba(255, 206, 86)',
+                    'rgba(75, 192, 192)',
+                    'rgba(153, 102, 255)',
+                    'rgba(255, 159, 64)',
+                    'rgba(255, 206, 86)',
+                    'rgba(75, 192, 192)',
+                    'rgba(153, 102, 255)',
+                    'rgba(255, 159, 64)'
+                ],
+            }]
+        },
+        options: {
+            legend:{
+                display:false
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+        }
+    });
+</script>
+
+<script>
+    var ctx = document.getElementById('myChart2').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{chart3_label|safe}},
+            datasets: [{
+                label: 'Loans',
+                data: {{ chart3_data|safe }},
+                borderColor: "#3e95cd",
+                fill:false
+            }]
+        },
+        options: {
+            legend:{
+                display:false
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+        }
+    });
+</script>
+
+</body>
+</html>

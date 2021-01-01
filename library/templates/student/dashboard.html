@@ -4,22 +4,114 @@
     <meta charset="UTF-8">
     <title>Student Dashboard</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.min.css">
+    <script src="/static/js/jquery-3.5.1.slim.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
 </head>
 <body>
 
-Logged In
+<!-- Header -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-custom">
+    <a class="navbar-brand"> <img src="/static/images/logo.png" height="30px" class="mr-3">Library System</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-{{ student.username }}
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+                <a class="nav-link">{{ student.username }}</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<!-- End of Header -->
 
-<a class="btn btn-primary" href="/logout">Log Out</a>
+<div class="container mt-4 p-5 rounded shadow">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" href="/student/dashboard">Dashboard</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/student/booklist">Booklist</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/student/history">Loan History</a>
+        </li>
+    </ul>
 
-<a class="btn btn-primary" href="/student/booklist">Booklist</a>
 
-<a class="btn btn-primary" href="/student/history">History</a>
+    <div class="row mt-5">
+
+        <div class="col" align="center" >
+            <img src="/static/{{ student.photo }}" width="200px">
+        </div>
 
 
+        <div class="col-6">
+            <div class="row mb-3">
+                <div class="col">
+                    <h4 class="title">
+                        <b>Hello, {{ student.first_name }} {{ student.last_name }}</b>
+                    </h4>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-3">
+                    <b>Student ID</b>
+                </div>
+                <div class="col-9">{{student.studentID}}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-3">
+                    <b>Username</b>
+                </div>
+                <div class="col-9">{{student.username}}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-3">
+                    <b>Major</b>
+                </div>
+                <div class="col-9">{{student.major}}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-3">
+                    <b>Gender</b>
+                </div>
+                <div class="col-9">
+                    {% if student.gender %}
+                        Male
+                    {% else %}
+                        Female
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-3">
+                    <b>Total Book Loan</b>
+                </div>
+                <div class="col-9">{{total_loan}}</div>
+            </div>
 
+            <div class="row mb-2">
+                <div class="col-3">
+                    <b>Unreturned Book</b>
+                </div>
+                <div class="col-9">{{unreturned}}</div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 
 </body>
+
+
 </html>

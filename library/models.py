@@ -19,7 +19,7 @@ class Book(models.Model):
     pub_date = models.DateField()
     type = models.CharField(max_length=50)
     stock = models.IntegerField()
-    cover = models.ImageField(upload_to='images',null=True)
+    cover = models.ImageField(upload_to='images/cover',null=True)
 
 class Borrow(models.Model):
     borrowed_date = models.DateField()

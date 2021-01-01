@@ -1,0 +1,38 @@
+.bg-custom {
+    background-color: #389393;
+}
+
+.btn-custom {
+    color: white;
+    background-color: #389393;
+}
+
+.btn-custom:hover{
+    color: white;
+    background-color: #2d7070;
+}
+
+.cover_thumb{
+    height: 90px;
+    width: 60px;
+    object-fit: cover;
+}
+
+.nav-tabs .nav-item .nav-link {
+        color: #389393;
+}
+
+.nav-tabs .nav-item .active {
+        color: white;
+        background-color: #389393;
+}
+
+.card {
+	border: none;
+}
+
+.similar-img {
+    height: 190px;
+    width: 140px;
+    object-fit: cover;
+}
