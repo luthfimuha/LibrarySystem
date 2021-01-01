@@ -18,6 +18,12 @@
     object-fit: cover;
 }
 
+.photo_thumb{
+    height: 90px;
+    width: 90px;
+    object-fit: cover;
+}
+
 .nav-tabs .nav-item .nav-link {
         color: #389393;
 }

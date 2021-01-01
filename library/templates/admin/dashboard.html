@@ -44,13 +44,16 @@
         <li class="nav-item">
             <a class="nav-link" href="/admin/borrowlist">Loan List</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/studentlist">Student List</a>
+        </li>
     </ul>
 
 
     <div class="row mt-5">
 
         <div class="col" align="center">
-             <h5 class="mb-3">Number of Books by Category</h5>
+            <h5 class="mb-3">Number of Books by Category</h5>
             <canvas id="myChart" width="100" height="30"></canvas>
         </div>
 
@@ -63,10 +66,10 @@
             <div class="row">
                 {% for book in top3_books %}
                     <div class="col">
-                    
-                    <img class="cover_thumb" src="/static/{{ book.cover }}"> <br>
 
-                    {{ book.name }} <br>
+                        <img class="cover_thumb" src="/static/{{ book.cover }}"> <br>
+
+                        {{ book.name }} <br>
                         <b> Total Loan : {{ book.num_loan }} </b>
 
                     </div>

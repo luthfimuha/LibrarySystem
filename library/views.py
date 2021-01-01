@@ -370,6 +370,10 @@ def admin_booklist(request):
     booklist = paginator.page(page)
     return render(request,'admin/booklist.html',{'booklist':booklist})
 
+def admin_studentlist(request):
+    studentlist = Student.objects.all()
+    return render(request, 'admin/studentlist.html', {'studentlist': studentlist})
+
 def admin_borrowlist(request):
     borrowlist = Borrow.objects.all()
     return render(request,'admin/borrowlist.html',{'borrowlist':borrowlist})
