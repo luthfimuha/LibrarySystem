@@ -17,8 +17,10 @@ from django.core.paginator import Paginator
 
 from django.db.models import Count
 
+from django.core.mail import send_mail
+
 from django.shortcuts import render, HttpResponse, redirect
-from library.models import Student, Book, Borrow
+from library.models import Student, Book, Borrow, Admin
 # Create your views here.
 
 def getHome(request):
@@ -47,19 +49,24 @@ def register(request):
             first_name = request.POST.get('first_name')
             last_name = request.POST.get('last_name')
             studentID = request.POST.get('student_id')
+            email = request.POST.get('email')
             major = request.POST.get('major')
             gender = request.POST.get('gender')
             photo = request.FILES.get('photo')
+            today = date.today()
+            register_date = today.strftime("%Y-%m-%d")
 
             student = Student()
             student.first_name = first_name
             student.last_name = last_name
             student.studentID = studentID
+            student.email = email
             student.username = username
             student.password = password
             student.major = major
             student.gender = gender
             student.photo = photo
+            student.register_date = register_date
             student.save()
 
             # return render(request, 'login.html', {'success':'Account created. Please login.'})
@@ -210,6 +217,22 @@ def stu_return(request):
 
         return redirect('/student/history')
 
+def sendemail(request):
+    email = request.POST.get('email')
+    student_name = request.POST.get('first_name') + ' ' + request.POST.get('last_name')
+    book_name = request.POST.get('book_name')
+    borrow_date = request.POST.get('borrowed_date')
+    due_date = request.POST.get('due_date')
+
+    subject = 'Hello, {}. Reminder about your book loan!'.format(student_name)
+    message = 'Hello, {}. This is a reminder about your book loan \n'.format(student_name) + 'Book name : {} \n'.format(book_name) + 'Loan date : {} \n'.format(borrow_date)+ 'Due date : {} \n'.format(due_date) +'Thank you for your attention.'
+    from_email = 'librarysystem69@gmail.com'
+    recipient_list = [email]
+    send_mail( subject=subject, message=message, from_email=from_email, recipient_list=recipient_list)
+    print(recipient_list)
+    request.session['success'] = 'Email to {} has been sent.'.format(student_name)
+
+    return redirect('/admin/borrowlist/')
 
 
 def stu_showbook(request):
@@ -227,13 +250,19 @@ def stu_showbook(request):
 
     # Filling NaNs with empty string
     bookrec['desc'] = bookrec['desc'].fillna('')
+    # # Filling the TF IDF on the 'description'
+    # tfv_matrix = tfv.fit_transform(bookrec['desc'])
+    # cosine_sim = sigmoid_kernel(tfv_matrix, tfv_matrix)
+    # # Reverse mapping of indices and book titles
+    # indices = pd.Series(bookrec.index, index=bookrec['id']).drop_duplicates()
+
     # Filling the TF IDF on the 'description'
     tfv_matrix = tfv.fit_transform(bookrec['desc'])
-    cosine_sim = sigmoid_kernel(tfv_matrix, tfv_matrix)
+    sig = sigmoid_kernel(tfv_matrix, tfv_matrix)
     # Reverse mapping of indices and book titles
     indices = pd.Series(bookrec.index, index=bookrec['id']).drop_duplicates()
 
-    def recommendation(id, cosine_sim=cosine_sim):
+    def recommendation(id, sig=sig):
         bid = []
         bname = []
         bdesc = []
@@ -246,16 +275,16 @@ def stu_showbook(request):
         idx = indices[id]
 
         # Get the pairwise similarity scores
-        sim_scores = list(enumerate(cosine_sim[idx]))
+        sig_scores = list(enumerate(sig[idx]))
 
         # Sort the books
-        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+        sig_scores = sorted(sig_scores, key=lambda x: x[1], reverse=True)
 
         # Scores of the 3 most similar books
-        sim_scores = sim_scores[1:4]
+        sig_scores = sig_scores[1:4]
 
         # Book indices
-        book_indices = [i[0] for i in sim_scores]
+        book_indices = [i[0] for i in sig_scores]
 
         for ind in book_indices:
             bid.append(list(bookrec.id)[ind])
@@ -287,7 +316,40 @@ def stu_history(request):
 
 
 def admin_login(request):
-    return render(request, 'admin/admin_login.html')
+
+    if request.method == 'GET':
+        return render(request, 'admin/admin_login.html')
+
+    else:
+        username = str(request.POST.get('username')).lower()
+        password = request.POST.get('password')
+
+        try:
+            admin = Admin.objects.get(username=username, password=password)
+
+        except:
+            return render(request, 'admin/admin_login.html', {'msg': "Username or password is incorrect, try again."})
+
+        else:
+            request.session['admin'] = admin.username
+            response = redirect('/admin/dashboard')
+            return response
+
+    # if request == 'GET':
+    #     return render(request, 'admin/admin_login.html')
+    # else:
+    #     username = str(request.POST.get('username')).lower()
+    #     password = request.POST.get('password')
+    #
+    #     try:
+    #         admin = Admin.objects.get(username=username, password=password)
+    #
+    #     except:
+    #         return render(request, 'admin/admin_login.html')
+    #
+    #     else:
+    #         request.session['admin'] = admin.username
+    #         return redirect('/admin/dashboard')
 
 def admin_logout(request):
     if request.session.has_key('admin'):
@@ -297,69 +359,99 @@ def admin_logout(request):
 
 
 def admin_dashboard(request):
-    # Chart 1, Book By Category
-
-    chart1_label = []
-    chart1_data = []
-    book_types = Book.objects.values('type').distinct()
-    for type in book_types:
-        chart1_label.append(type['type'])
-
-    for label in chart1_label:
-        chart1_data.append(Book.objects.filter(type=label).count())
-
-    # Chart 2, Top 3 Most Loaned Book
-
-    top3_books = Book.objects.annotate(num_loan=Count('borrow')).order_by('-num_loan')[:3]
-
-    # Chart 3, Number of Loan by Day
-
-    chart3_label = []
-    chart3_data = []
-
-    loan_dates = Borrow.objects.values('borrowed_date').distinct()
-
-    for date in loan_dates:
-        chart3_label.append(str(date['borrowed_date']))
-
-    for label in chart3_label:
-        chart3_data.append(Borrow.objects.filter(borrowed_date=label).count())
-
-    print(loan_dates)
-    print(chart3_label)
-    print(chart3_data)
-
-    context = {
-        'chart1_label': chart1_label,
-        'chart1_data': chart1_data,
-        'top3_books': top3_books,
-        'chart3_label': chart3_label,
-        'chart3_data': chart3_data,
-    }
 
     if request.session.has_key('admin'):
+
+        # Chart 1, Book By Category
+
+        chart1_label = []
+        chart1_data = []
+        book_types = Book.objects.values('type').distinct()
+
+
+        for type in book_types:
+            chart1_label.append(type['type'])
+
+        for label in chart1_label:
+            chart1_data.append(Book.objects.filter(type=label).count())
+
+        # Chart 2, Top 3 Most Loaned Book
+
+        top3_books = Book.objects.annotate(num_loan=Count('borrow')).order_by('-num_loan')[:3]
+
+
+
+        # Chart 3, Number of Loan by Day
+
+        chart3_label = []
+        chart3_data = []
+
+        loan_dates = Borrow.objects.values('borrowed_date').distinct()
+
+        for date in loan_dates:
+            chart3_label.append(str(date['borrowed_date']))
+
+        for label in chart3_label:
+            chart3_data.append(Borrow.objects.filter(borrowed_date=label).count())
+
+        # Chart 4, Top 3 categories
+
+        categories = []
+        for category in book_types:
+            categories.append(category['type'])
+
+        loan_per_categories = []
+
+        for category in categories:
+            count = Borrow.objects.filter(book__type=category).count()
+            loan_per_categories.append(count)
+
+        # Chart 5, Number of Register by Day
+
+        chart5_label = []
+        chart5_data = []
+
+        register_dates = Student.objects.values('register_date').distinct()
+
+        for date in register_dates:
+            chart5_label.append(str(date['register_date']))
+
+        for label in chart5_label:
+            chart5_data.append(Student.objects.filter(register_date=label).count())
+
+        print(chart5_label)
+        print(chart5_data)
+
+
+        print(categories)
+        print(loan_per_categories)
+
+        print(loan_dates)
+        print(chart3_label)
+        print(chart3_data)
+
+        context = {
+            'chart1_label': chart1_label,
+            'chart1_data': chart1_data,
+            'top3_books': top3_books,
+            'chart3_label': chart3_label,
+            'chart3_data': chart3_data,
+            'chart4_label': categories,
+            'chart4_data': loan_per_categories,
+            'chart5_label': chart5_label,
+            'chart5_data': chart5_data,
+
+        }
 
         return render(request, 'admin/dashboard.html', context=context)
 
 
-
     else:
-        if request.method == 'POST':
-            username = str(request.POST.get('username')).lower()
-            password = request.POST.get('password')
+        return redirect('/admin/login')
 
-            if username == 'admin' and password == 'admin':
-                request.session['admin'] = 'Ok'
-                return render(request, 'admin/dashboard.html',context=context)
-
-            else:
-                return render(request, 'admin/admin_login.html',
-                              {'msg': "Username or password is incorrect, try again."})
-
-        else:
-            return redirect('/admin/login')
 
 def admin_booklist(request):
+
     page = request.GET.get('page', 1)
     keyword = request.GET.get('keyword',"")
     if keyword != "":
@@ -375,8 +467,17 @@ def admin_studentlist(request):
     return render(request, 'admin/studentlist.html', {'studentlist': studentlist})
 
 def admin_borrowlist(request):
+
+    if request.session.has_key('success'):
+        success = request.session['success']
+        del request.session['success']
+
+    else:
+        success = None
+
+
     borrowlist = Borrow.objects.all()
-    return render(request,'admin/borrowlist.html',{'borrowlist':borrowlist})
+    return render(request,'admin/borrowlist.html',{'borrowlist':borrowlist,'success':success})
 
 def admin_updatebook(request):
     if request.method == 'GET':

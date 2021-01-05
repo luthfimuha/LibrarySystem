@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/studentlist/', views.admin_studentlist),
     path('admin/booklist/update', views.admin_updatebook),
     path('admin/addbook', views.admin_addbook),
+    path('admin/sendemail/', views.sendemail),
     path('saveupdate/', views.admin_saveupdate),
     path('admin/borrowlist/', views.admin_borrowlist),
     path('login/', views.login),

@@ -48,8 +48,14 @@
         </li>
     </ul>
 
+    {% if success != null %}
+        <div class="alert alert-success mt-3" role="alert">
+            {{ success }}
+        </div>
+    {% endif %}
 
-    <table class="table table-striped mt-5">
+
+    <table class="table table-striped mt-3">
         <thead class="thead-dark">
         <tr>
             <th scope="col">Book ID</th>
@@ -58,7 +64,10 @@
             <th scope="col">Loan Date</th>
             <th scope="col">Due Date</th>
             <th scope="col">Status</th>
-            <th scope="col">Borrower Name</th>
+            <th scope="col">Borrower</th>
+            <th scope="col">Detail</th>
+            <th scope="col">Send Email</th>
+
         </tr>
         </thead>
         <tbody>
@@ -72,6 +81,27 @@
                 <td>{{ borrow.due_date }}</td>
                 <td>{{ borrow.status }}</td>
                 <td>{{ borrow.student.first_name }} {{ borrow.student.last_name }}</td>
+                <td>
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-custom" data-toggle="modal" data-target="#modal{{ borrow.id }}">
+                       Show
+                    </button>
+                </td>
+                <td>
+                    {% if borrow.status != 'Returned' %}
+                        <form method="POST" enctype="multipart/form-data" action="/admin/sendemail/">
+                            {% csrf_token %}
+                            <input type="hidden" name="first_name" value="{{ borrow.student.first_name }}">
+                            <input type="hidden" name="last_name" value="{{ borrow.student.last_name }}">
+                            <input type="hidden" name="book_name" value="{{ borrow.book.name }}">
+                            <input type="hidden" name="borrowed_date" value="{{ borrow.borrowed_date }}">
+                            <input type="hidden" name="due_date" value="{{ borrow.due_date }}">
+                            <input type="hidden" name="email" value="{{ borrow.student.email }}">
+                            <button class="btn btn-danger" type="submit"><i class="fa fa-envelope" aria-hidden="true"></i></button>
+                        </form>
+                    {% endif %}
+
+                </td>
             </tr>
         {% endfor %}
         </tbody>
@@ -81,6 +111,89 @@
 </div>
 
 
+{% for borrow in borrowlist %}
+    <!-- Modal -->
+    <div class="modal fade pb-4" id="modal{{ borrow.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Loan Detail</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+
+                            <div class="col mb-2" align="center">
+
+                                <h5>Book Detail</h5>
+
+
+
+                                <table width="100%">
+                                    <tr align="center">
+                                        <td><img src="/static/{{ borrow.book.cover }}" class="cover_modal"></td>
+                                    </tr>
+                                    <tr align="center">
+                                        <td style="padding-top: 20px">{{ borrow.book.name }}</td>
+                                    </tr>
+                                    <tr align="center">
+                                        <td> <b>Author</b> : {{ borrow.book.author }}</td>
+                                    </tr>
+                                    <tr align="center">
+                                        <td> <b>Pub Date</b> : {{ borrow.book.pub_date }}</td>
+                                    </tr>
+                                </table>
+
+
+
+
+                            </div>
+
+                            <div class="col mb-2" align="center" >
+
+                                <h5>Student Detail</h5>
+                                <table width="100%">
+                                    <tr align="center">
+                                        <td><img src="/static/{{ borrow.student.photo }}" class="cover_modal"></td>
+                                    </tr>
+                                    <tr align="center">
+                                        <td style="padding-top: 20px">{{ borrow.student.first_name }} {{ borrow.student.last_name }}</td>
+                                    </tr>
+                                    <tr align="center">
+                                        <td> <b>Username</b> : {{ borrow.student.username }}</td>
+                                    </tr>
+                                    <tr align="center">
+                                        <td> <b>Gender</b> : {% if borrow.student.gender %}
+                                            Male
+                                        {% else %}
+                                            Female
+                                        {% endif %}</td>
+                                    </tr>
+
+                                    <tr align="center">
+                                        <td> <b>Major</b> : {{ borrow.student.major }}</td>
+                                    </tr>
+
+                                    <tr align="center">
+                                        <td> <b>Email</b> : {{ borrow.student.email }}</td>
+                                    </tr>
+
+                                    </td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
 
 
 

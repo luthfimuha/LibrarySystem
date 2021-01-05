@@ -8,8 +8,10 @@ class Student(models.Model):
     username = models.CharField(max_length=30, unique=True)
     password = models.CharField(max_length=30)
     major = models.CharField(max_length=30)
+    email = models.CharField(max_length=50, default=None)
     gender = models.BooleanField(default=False)
     photo = models.ImageField(upload_to='images',null=True)
+    register_date = models.DateField(default=None)
 
 
 class Book(models.Model):
@@ -27,5 +29,9 @@ class Borrow(models.Model):
     status = models.CharField(max_length=50)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
+
+class Admin(models.Model):
+    username = models.CharField(max_length=30, unique=True)
+    password = models.CharField(max_length=30)
 
 

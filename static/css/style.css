@@ -18,6 +18,12 @@
     object-fit: cover;
 }
 
+.cover_modal{
+    height: 120px;
+    width: 80px;
+    object-fit: cover;
+}
+
 .photo_thumb{
     height: 90px;
     width: 90px;

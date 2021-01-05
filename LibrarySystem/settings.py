@@ -132,3 +132,9 @@ STATICFILES_DIRS=[
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static')
 FONT_PATH = os.path.join(BASE_DIR,'static/fonts/mono.ttf')
+
+EMAIL_USE_SSL = True
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_PORT='465'
+EMAIL_HOST_USER = 'librarysystem69@gmail.com'
+EMAIL_HOST_PASSWORD = 'Boriskeren99'

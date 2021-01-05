@@ -85,6 +85,27 @@
 
     </div>
 
+    <div class="row mt-5">
+
+        <div class="col" align="center">
+
+            <h5>Number of loan by category</h5>
+
+            <canvas id="pie-chart" width="200" height="150"></canvas>
+        </div>
+
+        <div class="col" align="center">
+
+            <h5>Number of Register by Day</h5>
+            <canvas id="myChart5" width="100" height="30"></canvas>
+
+        </div>
+
+
+    </div>
+
+
+
 </div>
 
 {#<script>#}
@@ -132,10 +153,10 @@
                     'rgba(75, 192, 192)',
                     'rgba(153, 102, 255)',
                     'rgba(255, 159, 64)',
-                    'rgba(255, 206, 86)',
-                    'rgba(75, 192, 192)',
-                    'rgba(153, 102, 255)',
-                    'rgba(255, 159, 64)'
+                    '#c45850',
+                    '#8e5ea2',
+                    '#3cba9f',
+                    '#e8c3b9'
                 ],
             }]
         },
@@ -180,6 +201,61 @@
             },
         }
     });
+</script>
+
+<script>
+    var ctx = document.getElementById('myChart5').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{chart5_label|safe}},
+            datasets: [{
+                label: 'Registers',
+                data: {{ chart5_data|safe }},
+                borderColor: "#3e95cd",
+                fill:false
+            }]
+        },
+        options: {
+            legend:{
+                display:false
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+        }
+    });
+</script>
+
+<script>
+
+    new Chart(document.getElementById("pie-chart"), {
+    type: 'doughnut',
+    data: {
+      labels: {{ chart4_label|safe }},
+      datasets: [{
+        label: "Loan",
+        backgroundColor: ['rgba(255, 99, 132)',
+                    'rgba(54, 162, 235)',
+                    'rgba(255, 206, 86)',
+                    'rgba(75, 192, 192)',
+                    'rgba(153, 102, 255)',
+                    'rgba(255, 159, 64)',
+                    '#c45850',
+                    '#8e5ea2',
+                    '#3cba9f',
+                    '#e8c3b9'],
+        data: {{ chart4_data|safe }}
+      }]
+    },
+    options: {
+    }
+});
+
 </script>
 
 </body>
